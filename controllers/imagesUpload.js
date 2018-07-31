@@ -1,8 +1,8 @@
 const User = require('../models/user');
 const multer = require('multer');
 const path = require('path');
-var sharp = require('sharp');
-
+const sharp = require('sharp');
+const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: './public/uploads/',
@@ -78,8 +78,23 @@ exports.resized = function (req, res, next) {
 }
 
 exports.deleteImage = function (req, res, next) {
+    fs.exists(`./public/resized/uploads/${req.params.id}`, function(exists) {
+        if(exists) {
+            fs.unlink(`./public/resized/uploads/${req.params.id}`,function(err){
+                if(err) return console.log(err);
+                console.log('file deleted successfully');
+            });
+        }
+    });
+    fs.exists(`./public/uploads/${req.params.id}`, function(exists) {
+        if(exists) {
+            fs.unlink(`./public/uploads/${req.params.id}`,function(err){
+                if(err) return console.log(err);
+                console.log('file deleted successfully');
+            });
+        }
+    });
     let newFilesArr = req.user.files.filter(elem => elem !== 'uploads/' + req.params.id)
-
     if (req.user.files.length === newFilesArr.length) {
         res.send({
             msg: 'No file found.'

@@ -13,7 +13,9 @@ const localLogin = new LocalStrategy(localOptions, function(email, password, don
     // otherwise, call done with false
 
     User.findOne({ email: email }, function(err, user) {
-        if (err) { return done(err); }
+        if (user === null) {
+            return done(null, {error: 'User not found!'});
+        }
         if (!user) { return done(null, false); }
 
         // compare passwords - is `password` equal to user.password?
